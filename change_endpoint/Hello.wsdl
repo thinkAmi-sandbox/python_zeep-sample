@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+        xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:ns0="http://example.com/HelloWorld"
+        targetNamespace="http://example.com/HelloWorld">
+
+    <wsdl:types>
+        <xsd:schema elementFormDefault="qualified" targetNamespace="http://example.com/HelloWorld">
+            <xsd:element name="RequestInterface">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" name="userName" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="ResponseInterface">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" name="returnMessage" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="messageIn">
+        <wsdl:part name="parameters" element="ns0:RequestInterface" />
+    </wsdl:message>
+    <wsdl:message name="messageOut">
+        <wsdl:part name="parameters" element="ns0:ResponseInterface" />
+    </wsdl:message>
+
+    <wsdl:portType name="HelloPort">
+        <wsdl:operation name="requestMessage">
+            <wsdl:input message="ns0:messageIn"/>
+            <wsdl:output message="ns0:messageOut"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="HelloBindingSoap11" type="ns0:HelloPort">
+        <soap11:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="requestMessage">
+            <soap11:operation soapAction="http://example.com/HelloWorld/requestMessage" />
+            <wsdl:input>
+                <soap11:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap11:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="HelloService">
+        <wsdl:port name="HelloServicePort" binding="ns0:HelloBindingSoap11">
+            <!-- 差し替え元のエンドポイント設定 -->
+            <soap11:address location="http:/example.com/hello"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
