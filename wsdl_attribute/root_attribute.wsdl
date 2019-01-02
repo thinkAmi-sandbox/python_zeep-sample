@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+        xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:ns0="http://example.com/HelloWorld"
+        targetNamespace="http://example.com/HelloWorld">
+
+    <wsdl:types>
+        <!-- ここのtargetNamespaceも適当に設定(先ほどのと同じでもOK) -->
+        <xsd:schema elementFormDefault="qualified" targetNamespace="http://example.com/HelloWorld">
+            <xsd:element name="RequestInterface">
+                <xsd:complexType>
+                    <xsd:sequence>
+
+                        <xsd:element minOccurs="0" name="image"/>
+
+                        <!--ここにattributeを入れるとエラーになる-->
+                        <!--
+                        zeep.exceptions.XMLParseError:
+                        Unexpected element {http://www.w3.org/2001/XMLSchema}attribute in xsd:sequence
+                        -->
+                        <!--<xsd:attribute name="href" type="xsd:string" />-->
+                    </xsd:sequence>
+
+                    <!--ここにattributeを付けるとRequestInterfaceのhrefとなる-->
+                    <xsd:attribute name="href" type="xsd:string" />
+
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="ResponseInterface">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" name="returnMessage" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="messageIn">
+        <wsdl:part name="parameters" element="ns0:RequestInterface" />
+    </wsdl:message>
+    <wsdl:message name="messageOut">
+        <!--
+        独自定義の型を使用するため、element属性にて上記のelementのname属性をセット
+        name属性の値は、慣例的に parameters っぽい(他の名称にしても動作する)
+        -->
+        <wsdl:part name="parameters" element="ns0:ResponseInterface" />
+    </wsdl:message>
+
+    <wsdl:portType name="AttributePort">
+        <wsdl:operation name="requestMessage">
+            <!-- リクエスト(input)とレスポンス(output)の型を特定するため、上記messageのname属性をセット -->
+            <wsdl:input message="ns0:messageIn"/>
+            <wsdl:output message="ns0:messageOut"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <!-- 上記のportTypeを使うため、type属性にはportTypeのname属性をセット -->
+    <wsdl:binding name="AttributeBindingSoap11" type="ns0:AttributePort">
+        <!-- 独自の型定義を使っているため、styleには document をセット -->
+        <soap11:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <!-- portTypeの中にあるoperationのnameと同じ値をセット(今回の場合、requestMessage) -->
+        <wsdl:operation name="requestMessage">
+            <!-- soapAction は適当な値で良さそう -->
+            <soap11:operation soapAction="http://example.com/HelloWorld/requestMessage" />
+            <wsdl:input>
+                <soap11:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap11:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="HelloService">
+        <!-- binding属性には、上記bindingのname属性をセット -->
+        <wsdl:port name="AttributeServicePort" binding="ns0:AttributeBindingSoap11">
+            <!-- 実際にアクセスするURL(今回はSOAP UI のモックURL)をセット -->
+            <soap11:address location="http://localhost:9500/attributeBindingSoap11"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
