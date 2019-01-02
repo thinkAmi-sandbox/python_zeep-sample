@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 名前空間 my (任意の名前で可)を追加 -->
 <wsdl:definitions
         xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
         xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/"
@@ -6,6 +7,7 @@
         xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
         xmlns:ns0="http://example.com/HelloWorld"
+        xmlns:my="http://example.com/HelloWorld"
         targetNamespace="http://example.com/HelloWorld">
 
     <wsdl:types>
@@ -15,17 +17,15 @@
                 <xsd:complexType>
                     <xsd:sequence>
                         <!-- このelementにattributeを設定するため、refで別の型を参照させる -->
-                        <xsd:element minOccurs="0" ref="image"/>
+                        <!-- SOAP UIで動作させるため、名前空間(my)を付与して、参照先を明確にする -->
+                        <xsd:element minOccurs="0" ref="my:image"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
 
-            <!-- attributeを付けたい型の定義-->
+            <!-- refで参照する、attributeを付けたい型の定義-->
             <xsd:element name="image">
                 <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element minOccurs="0" name="image"/>
-                    </xsd:sequence>
                     <xsd:attribute name="href" type="xsd:string" />
                 </xsd:complexType>
             </xsd:element>
