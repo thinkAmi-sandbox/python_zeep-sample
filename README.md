@@ -21,4 +21,5 @@ directory, Tested environment, blog entry
     - [Python + Zeepにて、SOAPのinline(Base64エンコード)でファイルを送信する - メモ的な思考的な](http://thinkami.hatenablog.com/entry/2019/01/02/073810)
 - file_attachments/swa/
   - Python 3.7.1 & Zeep 3.2.0
-    -
+- wsdl_attribute/
+  - Python 3.7.1 & Zeep 3.2.0
