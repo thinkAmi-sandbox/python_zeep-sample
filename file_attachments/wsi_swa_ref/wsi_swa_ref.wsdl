@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ns0 は、WSDL内で定義を参照するのに使われる
+ targetNamespaceは、とりあえず適当に設定しておく
+
+ swaRefに対応するため、名前空間 ref を追加する
+ refは文献によって違うので、結果は以下だった
+ [NG] http://ws-i.org/profiles/basic/1.1/xsd
+ [NG] http://ws-i.org/profiles/basic/1.1/xsd/swaref.xsd
+
+ -->
+<!-- 名前空間 ref を追加 -->
+<wsdl:definitions
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+        xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:ns0="http://example.com/HelloWorld"
+        xmlns:ref="http://ws-i.org/profiles/basic/1.1/xsd"
+        targetNamespace="http://example.com/HelloWorld">
+
+    <wsdl:types>
+        <!-- ここのtargetNamespaceも適当に設定(先ほどのと同じでもOK) -->
+        <xsd:schema>
+            <!-- WSI:swaRef用の定義があるwebを参照できないため、ローカルxsd参照を追加する -->
+            <!--zeep.exceptions.NamespaceError: Unable to resolve type {http://ws-i.org/profiles/basic/1.1/xsd}swaRef. No schema available for the namespace 'http://ws-i.org/profiles/basic/1.1/xsd'.
+-->
+            <xsd:import namespace="http://ws-i.org/profiles/basic/1.1/xsd"
+                        schemaLocation="wsi_swa_ref.xsd" />
+        </xsd:schema>
+        <xsd:schema elementFormDefault="qualified" targetNamespace="http://example.com/HelloWorld">
+            <xsd:element name="RequestInterface">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <!-- WSI:swaRefのため、swaRef型の引数を用意 -->
+                        <xsd:element minOccurs="0" name="image" type="ref:swaRef" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="ResponseInterface">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="0" name="returnMessage" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="messageIn">
+        <wsdl:part name="parameters" element="ns0:RequestInterface" />
+    </wsdl:message>
+    <wsdl:message name="messageOut">
+        <!--
+        独自定義の型を使用するため、element属性にて上記のelementのname属性をセット
+        name属性の値は、慣例的に parameters っぽい(他の名称にしても動作する)
+        -->
+        <wsdl:part name="parameters" element="ns0:ResponseInterface" />
+    </wsdl:message>
+
+    <wsdl:portType name="SwaRefPort">
+        <wsdl:operation name="requestMessage">
+            <!-- リクエスト(input)とレスポンス(output)の型を特定するため、上記messageのname属性をセット -->
+            <wsdl:input message="ns0:messageIn">
+                <mime:multipartRelated>
+                    <mime:part>
+                        <soap11:body parts="body" use="literal"/>
+                    </mime:part>
+                    <mime:part>
+                        <mime:content part="image" type="image/png"/>
+                    </mime:part>
+                </mime:multipartRelated>
+            </wsdl:input>
+            <wsdl:output message="ns0:messageOut"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <!-- 上記のportTypeを使うため、type属性にはportTypeのname属性をセット -->
+    <wsdl:binding name="WsiSwaRefBindingSoap11" type="ns0:SwaRefPort">
+        <!-- 独自の型定義を使っているため、styleには document をセット -->
+        <soap11:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <!-- portTypeの中にあるoperationのnameと同じ値をセット(今回の場合、requestMessage) -->
+        <wsdl:operation name="requestMessage">
+            <!-- soapAction は適当な値で良さそう -->
+            <soap11:operation soapAction="http://example.com/HelloWorld/requestMessage" />
+            <wsdl:input>
+                <soap11:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap11:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="WsiSwaRefService">
+        <!-- binding属性には、上記bindingのname属性をセット -->
+        <wsdl:port name="WsiSwaRefServicePort" binding="ns0:WsiSwaRefBindingSoap11">
+            <!-- 実際にアクセスするURL(今回はSOAP UI のモックURL)をセット -->
+            <soap11:address location="http://localhost:9403/wsiSwaRefBindingSoap11"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
