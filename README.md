@@ -28,3 +28,4 @@ Directory, Tested environment, Blog entry
   - Python 3.7.1 & Zeep 3.2.0
 - `wsdl_attribute/`
   - Python 3.7.1 & Zeep 3.2.0
+    - [WSDLのelementにattributeを追加し、Python + ZeepでSOAPのエンベロープを作成する - メモ的な思考的な](http://thinkami.hatenablog.com/entry/2019/01/04/212657)
