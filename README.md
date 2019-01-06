@@ -27,6 +27,7 @@ Directory, Tested environment, Blog entry
     - [Python + Zeep にて、SOAPのswaRef でファイルを送信する - メモ的な思考的な](http://thinkami.hatenablog.com/entry/2019/01/05/121607)
 - `file_attachments/wsi_swa_ref/`
   - Python 3.7.1 & Zeep 3.2.0
+    - [Python + Zeep にて、SOAPの wsi:swaRef でファイルを送信する - メモ的な思考的な](http://thinkami.hatenablog.com/entry/2019/01/06/232024)
 - `wsdl_attribute/`
   - Python 3.7.1 & Zeep 3.2.0
     - [WSDLのelementにattributeを追加し、Python + ZeepでSOAPのエンベロープを作成する - メモ的な思考的な](http://thinkami.hatenablog.com/entry/2019/01/04/212657)
